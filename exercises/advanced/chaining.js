@@ -54,6 +54,22 @@ var lib = require('../../lib/advancedChainingHelpers.js');
 lib.setImageTaggerCredentials('YOUR_CLIENT_ID', 'YOUR_CLIENT_SECRET')
 
 var searchCommonTagsFromGitHubProfiles = function(githubHandles) {
+  var avatars = githubHandles.map(function(handle) {
+    lib.getGitHubProfile(handle)
+      .then(function(userObj) {
+        console.log('-------------', userObj);
+        userObj = JSON.parse(userObj);
+        return userObj.avatarUrl;
+      })
+      .catch(function(err) {
+        console.log('Could not find avatar', err);
+      });
+  });
+  Promise.all(avatars)
+    .then(function(avatars) {
+      console.log(avatars)
+    });
+  return new Promise(function(resolve, reject) {});
 };
 
 // Export these functions so we can unit test them

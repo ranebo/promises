@@ -1,9 +1,10 @@
 /******************************************************************
  *          Handling collections with Promise.all                 *
  ******************************************************************/
-
+var fs = require('fs');
 var Promise = require('bluebird');
 var asyncLib = require('../../lib/asyncLib.js');
+var pluck = require('../bare_minimum/promiseConstructor.js');
 
 /**
  * A common asyncronous pattern:
@@ -60,6 +61,22 @@ var asyncLib = require('../../lib/asyncLib.js');
 
 var combineFirstLineOfManyFiles = function (filePaths, writePath) {
  // YOUR CODE HERE
+ var output = filePaths.map(function(file) {
+  return pluck.pluckFirstLineFromFileAsync(file).catch(function(err) {
+    console.log('Could not read file', err);
+  });
+ });
+ return Promise.all(output).then(function(data) {
+  var lines = data.join('\n');
+  fs.writeFile(writePath, lines, 'utf8', function(err) {
+    if (err) {
+      reject(err);
+    }
+  });
+ })
+ .catch(function(err) {
+  console.log('Couldn\'t write a file', err);
+ });
 };
 
 // Export these functions so we can unit test them
